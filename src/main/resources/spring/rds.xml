@@ -13,7 +13,7 @@
     <context:property-placeholder location="classpath:/database_rds.properties" ignore-unresolvable="true"/>
 
     <!-- server database pool -->
-    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"
+    <bean id="serverDataSource" class="com.alibaba.druid.pool.DruidDataSource"
           init-method="init" destroy-method="close">
         <property name="url" value="${serverdatabase.url}"/>
         <property name="username" value="${database.username}"/>
@@ -46,9 +46,8 @@
     </bean>
 
     <!-- server database hibernate -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
-
+    <bean id="serverSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="serverDataSource"/>
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
@@ -60,7 +59,6 @@
                 <prop key="statement_cache.size">25</prop>
             </props>
         </property>
-
         <property name="mappingResources">
             <list>
                 <value>hbm/User.hbm.xml</value>
@@ -68,15 +66,75 @@
         </property>
     </bean>
 
+    <!-- server database pool -->
+    <bean id="communityDataSource" class="com.alibaba.druid.pool.DruidDataSource"
+          init-method="init" destroy-method="close">
+        <property name="url" value="${communitydatabase.url}"/>
+        <property name="username" value="${database.username}"/>
+        <property name="password" value="${database.password}"/>
+
+        <property name="maxActive" value="20"/>
+        <property name="initialSize" value="8"/>
+        <property name="maxWait" value="60000"/>
+        <property name="minIdle" value="1"/>
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="30000"/>
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <!-- 用来检测连接是否有效的sql，要求是一个查询语句-->
+        <property name="validationQuery" value="SELECT 'x'"/>
+
+        <property name="testWhileIdle" value="true"/>
+        <!-- 申请连接时执行validationQuery检测连接是否有效，配置为true会降低性能 -->
+        <property name="testOnBorrow" value="false"/>
+        <!-- 归还连接时执行validationQuery检测连接是否有效，配置为true会降低性能  -->
+        <property name="testOnReturn" value="false"/>
+
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+
+        <!--属性类型是字符串，通过别名的方式配置扩展插件，常用的插件有：
+			监控统计用的filter: stat;日志用的filter:log4j; 防御SQL注入的filter:wall -->
+        <property name="filters" value="stat"/>
+    </bean>
+
+    <!-- server database hibernate -->
+    <bean id="communitySessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="communityDataSource"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">false</prop>
+                <prop key="hibernate.connection.release_mode">after_transaction</prop>
+                <prop key="hibernate.transaction.auto_close_session">true</prop>
+                <prop key="hibernate.connection.autocommit">false</prop>
+                <prop key="statement_cache.size">25</prop>
+            </props>
+        </property>
+        <property name="mappingResources">
+            <list>
+                <value>hbm/CommunityUser.hbm.xml</value>
+            </list>
+        </property>
+    </bean>
+
+
     <!-- database transaction manager -->
-    <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
-        <property name="sessionFactory" ref="sessionFactory" />
+    <bean id="serverTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="serverSessionFactory" />
+    </bean>
+
+    <!-- database transaction manager -->
+    <bean id="communityTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="communitySessionFactory" />
     </bean>
 
     <bean id="persistenceExceptionTranslationPostProcessor"
           class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
 
-    <tx:annotation-driven transaction-manager="transactionManager" />
+    <tx:annotation-driven/>
 
     <!--<tx:advice id="txAdvice" transaction-manager="transactionManager">
         <tx:attributes>

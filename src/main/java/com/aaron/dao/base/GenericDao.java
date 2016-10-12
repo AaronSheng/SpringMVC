@@ -1,149 +1,53 @@
 package com.aaron.dao.base;
 
-import org.hibernate.Criteria;
-import org.hibernate.Query;
-import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
-import org.springframework.orm.hibernate4.support.HibernateDaoSupport;
 
 import java.io.Serializable;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 
 /**
  * Created by Aaron Sheng on 6/4/16.
  */
-public class GenericDao<T, PK extends Serializable> extends HibernateDaoSupport implements GenericDaoI<T, PK> {
-    protected Class<T> mEntityClass;
-    protected Class<PK> mPKClass;
+public interface GenericDao<T, PK extends Serializable> {
 
-    public GenericDao() {
-        Type type = getClass().getGenericSuperclass();
-        if (!(type instanceof ParameterizedType)) {
-            type = getClass().getSuperclass().getGenericSuperclass();
-        }
-        this.mEntityClass = (Class<T>) ((ParameterizedType) type).getActualTypeArguments()[0];
-        this.mPKClass = (Class<PK>) ((ParameterizedType) type).getActualTypeArguments()[1];
-    }
+    /* --------------< save >----------------------*/
+    void save(T entity);
 
-    public GenericDao(SessionFactory sessionFactory, Class<T> entityClass, Class<PK> pkClass) {
-        super.setSessionFactory(sessionFactory);
-        this.mEntityClass = entityClass;
-        this.mPKClass = pkClass;
-    }
+    void saveOrUpdate(T entity);
 
-    @Override
-    public void save(T entity) {
-        super.getHibernateTemplate().save(entity);
-    }
 
-    @Override
-    public void saveOrUpdate(T entity){
-        super.getHibernateTemplate().saveOrUpdate(entity);
-    }
+    /* -------------< update >-------------*/
+    void update(T entity);
 
-    @Override
-    public void update(T entity) {
-        super.getHibernateTemplate().update(entity);
-    }
+    void update(String sql, SqlParam... params);
 
-    @Override
-    public void update(String sql, SqlParam... params) {
-        createQuery(sql, params).executeUpdate();
-    }
+    void batchUpdate(String sql, List<SqlParam[]> paramsList);
 
-    @Override
-    public void batchUpdate(String sql, List<SqlParam[]> paramsList) {
-        for (int i = 0; i < paramsList.size(); i++) {
-            createQuery(sql, paramsList.get(i)).executeUpdate();
-        }
-    }
+    /* --------------< delete >----------------------*/
+    void delete(T entity);
 
-    @Override
-    public void delete(T entity) {
-        super.getHibernateTemplate().delete(entity);
-    }
+    void delete(String sql, SqlParam... params);
 
-    @Override
-    public void delete(String sql, SqlParam... params) {
-        createQuery(sql, params).executeUpdate();
-    }
+    void deleteAll(Collection<T> entitys);
 
-    @Override
-    public void deleteAll(Collection<T> entitys) {
-        super.getHibernateTemplate().deleteAll(entitys);
-    }
+    /* --------------< select >----------------------*/
+    List<T> findAll();
 
-    @Override
-    public List<T> findAll() {
-        return findByCriteria();
-    }
+    T findByPK(final PK id);
 
-    @Override
-    public T findByPK(final PK pk) {
-        return (T) super.currentSession().get(mEntityClass, pk);
-    }
+    List find(String sql, SqlParam... params);
 
-    @Override
-    public List find(String sql, SqlParam... params) {
-        return createQuery(sql, params).list();
-    }
+    List find(String sql, int start, int limit, SqlParam... params);
 
-    @Override
-    public List find(String sql, int start, int limit, SqlParam... params) {
-        Query query = createQuery(sql, params);
-        query.setFirstResult(start);
-        query.setMaxResults(limit);
-        return query.list();
-    }
+    Object findUnique(String sql, SqlParam... params);
 
-    @Override
-    public Object findUnique(String sql, SqlParam... params) {
-        return createQuery(sql, params).uniqueResult();
-    }
+    List<T> findByCriteria(Criterion... criterions);
 
-    @Override
-    public List<T> findByCriteria(Criterion... criterions) {
-        return (List<T>) createCriteria(criterions).list();
-    }
+    List<T> findByProperty(String propertyName, Object value);
 
-    @Override
-    public List<T> findByProperty(String propertyName, Object value) {
-        return (List<T>) createCriteria(Restrictions.eq(propertyName, value)).list();
-    }
+    T findUniqueByProperty(String propertyName, Object value);
 
-    @Override
-    public T findUniqueByProperty(String propertyName, Object value) {
-        return (T) createCriteria(Restrictions.eq(propertyName, value)).uniqueResult();
-    }
-
-    @Override
-    public Long count(String sql, SqlParam... params) {
-        return (Long) createQuery(sql, params).uniqueResult();
-    }
-
-    /* ---------------------- 公用辅助的方法 start -------------------- */
-    private Query createQuery(String sql, SqlParam... params) {
-        Query queryObject = super.currentSession().createQuery(sql);
-        if (params != null) {
-            for (int i = 0; i < params.length; i++) {
-                queryObject.setParameter(params[i].paramName, params[i].paramValue);
-            }
-        }
-        return queryObject;
-    }
-
-    private Criteria createCriteria(Criterion... criterions) {
-        Criteria criteria = super.currentSession().createCriteria(mEntityClass);
-        if (null != criterions) {
-            for (Criterion c : criterions) {
-                criteria.add(c);
-            }
-        }
-        return criteria;
-    }
-    /* ---------------------- 公用辅助的方法 end -------------------- */
+    /* --------------< count >------------------------*/
+    Long count(String sql, SqlParam... params);
 }

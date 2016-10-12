@@ -1,5 +1,6 @@
 package com.aaron.controller;
 
+import com.aaron.service.CommunityUserService;
 import com.aaron.service.UserService;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.log4j.Logger;
@@ -20,14 +21,18 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private CommunityUserService communityUserService;
 
     @RequestMapping(value = "/getName", method = RequestMethod.GET)
     @ResponseBody
     public JSONObject getName(@RequestParam("id")long id) {
         String name = userService.getName(id);
+        String cmName = communityUserService.getName(id);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("status", "ok");
         jsonObject.put("name", name);
+        jsonObject.put("community_name", cmName);
         return jsonObject;
     }
 
@@ -35,6 +40,7 @@ public class UserController {
     @ResponseBody
     public JSONObject setName(@RequestParam("id")long id, @RequestParam("name")String name) {
         userService.setName(id, name);
+        communityUserService.setName(id, name);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("status", "ok");
         jsonObject.put("result", "success");
