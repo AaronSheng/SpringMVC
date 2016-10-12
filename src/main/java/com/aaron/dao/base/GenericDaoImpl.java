@@ -29,12 +29,6 @@ public class GenericDaoImpl<T, PK extends Serializable> extends HibernateDaoSupp
         this.mPKClass = (Class<PK>) ((ParameterizedType) type).getActualTypeArguments()[1];
     }
 
-    public GenericDaoImpl(SessionFactory sessionFactory, Class<T> entityClass, Class<PK> pkClass) {
-        super.setSessionFactory(sessionFactory);
-        this.mEntityClass = entityClass;
-        this.mPKClass = pkClass;
-    }
-
     @Override
     public void save(T entity) {
         super.getHibernateTemplate().save(entity);
@@ -84,7 +78,7 @@ public class GenericDaoImpl<T, PK extends Serializable> extends HibernateDaoSupp
 
     @Override
     public T findByPK(final PK pk) {
-        return (T) super.currentSession().get(mEntityClass, pk);
+        return super.getHibernateTemplate().get(mEntityClass, pk);
     }
 
     @Override
@@ -94,10 +88,7 @@ public class GenericDaoImpl<T, PK extends Serializable> extends HibernateDaoSupp
 
     @Override
     public List find(String sql, int start, int limit, SqlParam... params) {
-        Query query = createQuery(sql, params);
-        query.setFirstResult(start);
-        query.setMaxResults(limit);
-        return query.list();
+        return createQuery(sql, params).setFirstResult(start).setMaxResults(limit).list();
     }
 
     @Override
@@ -125,7 +116,6 @@ public class GenericDaoImpl<T, PK extends Serializable> extends HibernateDaoSupp
         return (Long) createQuery(sql, params).uniqueResult();
     }
 
-    /* ---------------------- 公用辅助的方法 start -------------------- */
     private Query createQuery(String sql, SqlParam... params) {
         Query queryObject = super.currentSession().createQuery(sql);
         if (params != null) {
@@ -145,5 +135,4 @@ public class GenericDaoImpl<T, PK extends Serializable> extends HibernateDaoSupp
         }
         return criteria;
     }
-    /* ---------------------- 公用辅助的方法 end -------------------- */
 }

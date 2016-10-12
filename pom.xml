@@ -130,6 +130,12 @@
             <version>1.0.0.Final</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-jta</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
         <!-- druid + mysql -->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -190,7 +196,7 @@
                 </configuration>
             </plugin>
 
-            <plugin>
+            <!--<plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
@@ -203,9 +209,9 @@
                     </webAppConfig>
                     <scanIntervalSeconds>5</scanIntervalSeconds>
                 </configuration>
-            </plugin>
+            </plugin>-->
 
-            <!--<plugin>
+            <plugin>
                 <groupId>org.apache.tomcat.maven</groupId>
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>${tomcat.version}</version>
@@ -215,7 +221,7 @@
                     <uriEncoding>UTF-8</uriEncoding>
                     <server>tomcat7</server>
                 </configuration>
-            </plugin>-->
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

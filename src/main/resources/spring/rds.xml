@@ -20,7 +20,7 @@
         <property name="password" value="${database.password}"/>
 
         <property name="maxActive" value="20"/>
-        <property name="initialSize" value="8"/>
+        <property name="initialSize" value="4"/>
         <property name="maxWait" value="60000"/>
         <property name="minIdle" value="1"/>
 
@@ -45,7 +45,7 @@
         <property name="filters" value="stat"/>
     </bean>
 
-    <!-- server database hibernate -->
+    <!-- server database session factory -->
     <bean id="serverSessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="serverDataSource"/>
         <property name="hibernateProperties">
@@ -66,7 +66,13 @@
         </property>
     </bean>
 
-    <!-- server database pool -->
+    <!-- server database hibernate template -->
+    <bean id="serverHibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+        <property name="sessionFactory" ref="serverSessionFactory"/>
+    </bean>
+
+
+    <!-- community database pool -->
     <bean id="communityDataSource" class="com.alibaba.druid.pool.DruidDataSource"
           init-method="init" destroy-method="close">
         <property name="url" value="${communitydatabase.url}"/>
@@ -74,7 +80,7 @@
         <property name="password" value="${database.password}"/>
 
         <property name="maxActive" value="20"/>
-        <property name="initialSize" value="8"/>
+        <property name="initialSize" value="4"/>
         <property name="maxWait" value="60000"/>
         <property name="minIdle" value="1"/>
 
@@ -99,7 +105,7 @@
         <property name="filters" value="stat"/>
     </bean>
 
-    <!-- server database hibernate -->
+    <!-- community database session factory -->
     <bean id="communitySessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="communityDataSource"/>
         <property name="hibernateProperties">
@@ -120,6 +126,11 @@
         </property>
     </bean>
 
+    <!-- community database hibernate template -->
+    <bean id="communityHibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
+        <property name="sessionFactory" ref="communitySessionFactory"/>
+    </bean>
+
 
     <!-- database transaction manager -->
     <bean id="serverTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
@@ -131,8 +142,22 @@
         <property name="sessionFactory" ref="communitySessionFactory" />
     </bean>
 
-    <bean id="persistenceExceptionTranslationPostProcessor"
-          class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+    <!-- atomikos事务管理器 -->
+    <!--<bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"
+          init-method="init" destroy-method="close">
+        <description>UserTransactionManager</description>
+        <property name="forceShutdown" value="true" />
+    </bean>
+
+    <bean id="atomikosUserTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">
+        <property name="transactionTimeout" value="60" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.transaction.jta.JtaTransactionManager">
+        <property name="transactionManager" ref="atomikosTransactionManager" />
+        <property name="userTransaction" ref="atomikosUserTransaction" />
+        <property name="allowCustomIsolationLevels" value="true" />
+    </bean>-->
 
     <tx:annotation-driven/>
 

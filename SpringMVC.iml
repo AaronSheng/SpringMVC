@@ -53,6 +53,10 @@
     <orderEntry type="library" name="Maven: org.jboss:jandex:1.1.0.Final" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.common:hibernate-commons-annotations:4.0.4.Final" level="project" />
     <orderEntry type="library" name="Maven: org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.0.Final" level="project" />
+    <orderEntry type="library" name="Maven: com.atomikos:transactions-jta:4.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.atomikos:transactions-api:4.0.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.atomikos:transactions:4.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.atomikos:atomikos-util:4.0.1" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba:druid:1.0.13" level="project" />
     <orderEntry type="module-library">
       <library name="Maven: com.alibaba:jconsole:1.8.0">
