@@ -2,6 +2,7 @@ package com.aaron.dao;
 
 import com.aaron.dao.base.GenericDaoImpl;
 import com.aaron.entity.User;
+import org.hibernate.SessionFactory;
 import org.springframework.orm.hibernate4.HibernateTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -13,9 +14,9 @@ import javax.annotation.Resource;
 @Repository
 public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 
-    @Resource(name = "serverHibernateTemplate")
-    public void setServerHibernateTemplate(HibernateTemplate hibernateTemplate) {
-        super.setHibernateTemplate(hibernateTemplate);
+    @Resource(name = "serverSessionFactory")
+    public void setServerSessionFactory(SessionFactory sessionFactory) {
+        super.setSessionFactory(sessionFactory);
     }
 
     public User get(Long id) {

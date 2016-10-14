@@ -66,11 +66,6 @@
         </property>
     </bean>
 
-    <!-- server database hibernate template -->
-    <bean id="serverHibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
-        <property name="sessionFactory" ref="serverSessionFactory"/>
-    </bean>
-
 
     <!-- community database pool -->
     <bean id="communityDataSource" class="com.alibaba.druid.pool.DruidDataSource"
@@ -126,24 +121,20 @@
         </property>
     </bean>
 
-    <!-- community database hibernate template -->
-    <bean id="communityHibernateTemplate" class="org.springframework.orm.hibernate4.HibernateTemplate">
-        <property name="sessionFactory" ref="communitySessionFactory"/>
-    </bean>
 
-
-    <!-- database transaction manager -->
+    <!-- server database transaction manager -->
     <bean id="serverTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
         <property name="sessionFactory" ref="serverSessionFactory" />
     </bean>
 
-    <!-- database transaction manager -->
+    <!-- community database transaction manager -->
     <bean id="communityTransactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
         <property name="sessionFactory" ref="communitySessionFactory" />
     </bean>
 
-    <!-- atomikos事务管理器 -->
-    <!--<bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"
+    <!-- atomikos事务管理2PC -->
+    <!--
+    <bean id="atomikosTransactionManager" class="com.atomikos.icatch.jta.UserTransactionManager"
           init-method="init" destroy-method="close">
         <description>UserTransactionManager</description>
         <property name="forceShutdown" value="true" />
@@ -157,7 +148,20 @@
         <property name="transactionManager" ref="atomikosTransactionManager" />
         <property name="userTransaction" ref="atomikosUserTransaction" />
         <property name="allowCustomIsolationLevels" value="true" />
-    </bean>-->
+    </bean>
+    -->
+
+    <!-- 1PC事务管理 -->
+    <!--
+    <bean id="transactionManager" class="org.springframework.data.transaction.ChainedTransactionManager">
+        <constructor-arg>
+            <list>
+                <ref bean="serverTransactionManager"/>
+                <ref bean="communityTransactionManager"/>
+            </list>
+        </constructor-arg>
+    </bean>
+    -->
 
     <tx:annotation-driven/>
 
