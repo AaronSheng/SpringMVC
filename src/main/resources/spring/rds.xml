@@ -50,7 +50,6 @@
         <property name="dataSource" ref="serverDataSource"/>
         <property name="hibernateProperties">
             <props>
-                <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.connection.release_mode">after_transaction</prop>
@@ -105,7 +104,6 @@
         <property name="dataSource" ref="communityDataSource"/>
         <property name="hibernateProperties">
             <props>
-                <prop key="hibernate.current_session_context_class">org.springframework.orm.hibernate4.SpringSessionContext</prop>
                 <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
                 <prop key="hibernate.show_sql">false</prop>
                 <prop key="hibernate.connection.release_mode">after_transaction</prop>
